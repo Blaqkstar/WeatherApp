@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="JSON" type="kotlin.js">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/JSON" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/lib/JSON" />
+    </SOURCES>
+  </library>
+</component>
