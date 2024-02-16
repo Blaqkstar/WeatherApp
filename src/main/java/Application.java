@@ -3,36 +3,45 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.json.*;
-import javax.servlet.http.HttpServletRequest;
 
+//TODO: Maybe think about moving weather details into a "Weather" class so that I can just update attributes of an instance of the class when I parse/extract
 public class Application {
 
     public static void main(String[] args) {
+        Weather weather = new Weather(); // declares and instantiates weather
+
         // -------------------------------------- UI STUFF STARTS HERE!
         // creates main frame
         JFrame applicationFrame = new JFrame("Weather App");
-        applicationFrame.setSize(1600, 900);
+        applicationFrame.setSize(900, 450);
         applicationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // -------------------------------------- LOCATION PANEL STUFF
         // creates location selection panel
         JPanel locationPanel = new JPanel();
-        locationPanel.setPreferredSize(new Dimension(300,850));
+        locationPanel.setLayout(new GridBagLayout());
+        locationPanel.setLayout(new BoxLayout(locationPanel, BoxLayout.Y_AXIS)); // sets locationPanel to a column arrangement
+        locationPanel.setPreferredSize(new Dimension(200,400));
         locationPanel.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
 
         // contents of locationPanel
-        JTextField zipCodeInput = new JTextField(20); // zip code input field
+        JPanel locationSelectSubPanel = new JPanel(); // creates locationSelectSubPanel
+        locationSelectSubPanel.setLayout(new FlowLayout (FlowLayout.RIGHT)); // right-orients locationSelectSubPanel
+        JTextField zipCodeInput = new JTextField(8); // zip code input field
+        //TODO: NEED TO WORK OUT A WAY TO LIMIT ZIP CODE INPUT CHARACTERS TO 5 AND ADD ERROR CHECKING
         JLabel zipCodeLabel = new JLabel("Zip Code:"); // zip code label
         JButton detectLocationButton = new JButton("Detect Location"); // detect location button
 
-        // adds contents to locationPanel
-        locationPanel.add(zipCodeLabel); // adds zipCodeLabel to locationPanel
-        locationPanel.add(zipCodeInput); // adds zipCodeInput to locationPanel
-        locationPanel.add(detectLocationButton); // adds detectLocationButton to locationPanel
+        // adds contents to locationSelectSubPanel
+        locationSelectSubPanel.add(zipCodeLabel); // adds zipCodeLabel to locationPanel
+        locationSelectSubPanel.add(zipCodeInput); // adds zipCodeInput to locationPanel
+        locationSelectSubPanel.add(detectLocationButton); // adds detectLocationButton to locationPanel\
+
+        // adds locationSelectSubPanel to locationPanel
+        locationPanel.add(locationSelectSubPanel);
 
 
         // -------------------------------------- WEATHER PANEL STUFF
@@ -47,14 +56,15 @@ public class Application {
         // toggles frame visiblity
         applicationFrame.setVisible(true);
 
-        // gets weather data
-        String data = getWeatherData();
+        // -------------------------------------- BUTTON LOGIC
+        detectLocationButton.addActionListener(e -> {
+            // gets weather data
+            String data = getWeatherData();
+            // parses and displays data
+            parseAndDisplayData(data, weatherPanel, locationPanel, locationSelectSubPanel);
+        });
 
-        // parses and displays data
-        parseAndDisplayData(data, weatherPanel, locationPanel);
     }
-
-
 
     // METHODS
     public static String getWeatherData() {
@@ -123,7 +133,7 @@ public class Application {
         return location;
     }
 
-    public static void parseAndDisplayData(String data, JPanel weatherPanel, JPanel locationPanel) {
+    public static void parseAndDisplayData(String data, JPanel weatherPanel, JPanel locationPanel, JPanel locationSelectSubPanel) {
         // parse
         JSONObject jsonObject = new JSONObject(data);
         JSONObject location = jsonObject.getJSONObject("location"); // location header - use this to pull location data
@@ -153,19 +163,21 @@ public class Application {
         JLabel conditionLabel = new JLabel("Condition: " + condition);
 
         // sets label dimensions/alignment
-        locationLabel.setPreferredSize((new Dimension(300, 100)));
-        locationLabel.setHorizontalAlignment(JLabel.CENTER);
-        temperatureLabel.setPreferredSize(new Dimension(300, 100));
+        locationLabel.setPreferredSize((new Dimension(190, 50)));
+        locationLabel.setHorizontalAlignment(JLabel.RIGHT);
+        temperatureLabel.setPreferredSize(new Dimension(190, 50));
         temperatureLabel.setHorizontalAlignment(JLabel.CENTER);
-        conditionLabel.setPreferredSize(new Dimension(300, 100));
+        conditionLabel.setPreferredSize(new Dimension(190, 50));
         conditionLabel.setHorizontalAlignment(JLabel.CENTER);
 
         // adds labels to weather panel
-        locationPanel.add(locationLabel);
+        locationSelectSubPanel.add(locationLabel);
         weatherPanel.add(temperatureLabel);
         weatherPanel.add(conditionLabel);
 
         // refresh the frame
+        locationPanel.revalidate();
+        locationPanel.repaint();
         weatherPanel.revalidate();
         weatherPanel.repaint();
     }
