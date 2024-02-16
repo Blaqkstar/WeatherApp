@@ -61,7 +61,7 @@ public class Application {
             // gets weather data
             String data = getWeatherData();
             // parses and displays data
-            parseAndDisplayData(data, weatherPanel, locationPanel, locationSelectSubPanel);
+            parseAndDisplayData(data, weather, weatherPanel, locationPanel, locationSelectSubPanel);
         });
 
     }
@@ -133,34 +133,34 @@ public class Application {
         return location;
     }
 
-    public static void parseAndDisplayData(String data, JPanel weatherPanel, JPanel locationPanel, JPanel locationSelectSubPanel) {
+    public static void parseAndDisplayData(String data, Weather weather, JPanel weatherPanel, JPanel locationPanel, JPanel locationSelectSubPanel) {
         // parse
         JSONObject jsonObject = new JSONObject(data);
         JSONObject location = jsonObject.getJSONObject("location"); // location header - use this to pull location data
         JSONObject currentWeather = jsonObject.getJSONObject("current"); // current header - use this to pull current weather data
 
         // extract details
-        String cityName = location.getString("name"); // name of location
-        String stateName = location.getString("region"); // name of region/state
-        double temperatureC = currentWeather.getDouble("temp_c"); // temp celsius
-        double temperatureF = currentWeather.getDouble("temp_f"); // temp fahrenheit
-        String condition = currentWeather.getJSONObject("condition").getString("text"); // weather condition
-        double windMPH = currentWeather.getDouble("wind_mph"); // wind MPH
-        double windKPH = currentWeather.getDouble("wind_kph"); // wind KPH
-        String windDirection = currentWeather.getString("wind_dir"); // wind direction
-        double precipMM = currentWeather.getDouble("precip_mm"); // precipitation (mm)
-        double precipIN = currentWeather.getDouble("precip_in"); // preciptation (inches)
-        double humidity = currentWeather.getDouble("humidity"); // humidity
-        double cloudCoverage = currentWeather.getDouble("cloud"); // cloud coverage
-        double feelsLikeC = currentWeather.getDouble("feelslike_c"); // feels like (c)
-        double feelsLikeF = currentWeather.getDouble("feelslike_f"); // feels like (f)
-        double visionKM = currentWeather.getDouble("vis_km"); // vision (km)
-        double visionMiles = currentWeather.getDouble("vis_miles"); // vision (miles)
+        weather.setCityName(location.getString("name")); // name of location
+        weather.setStateName(location.getString("region")); // name of region/state
+        weather.setTemperatureC(currentWeather.getDouble("temp_c")); // temp celsius
+        weather.setTemperatureF(currentWeather.getDouble("temp_f")); // temp fahrenheit
+        weather.setCondition(currentWeather.getJSONObject("condition").getString("text")); // weather condition
+        weather.setWindMPH(currentWeather.getDouble("wind_mph")); // wind MPH
+        weather.setWindKPH(currentWeather.getDouble("wind_kph")); // wind KPH
+        weather.setWindDirection(currentWeather.getString("wind_dir")); // wind direction
+        weather.setPrecipMM(currentWeather.getDouble("precip_mm")); // precipitation (mm)
+        weather.setPrecipIN(currentWeather.getDouble("precip_in")); // preciptation (inches)
+        weather.setHumidity(currentWeather.getDouble("humidity")); // humidity
+        weather.setCloudCoverage(currentWeather.getDouble("cloud")); // cloud coverage
+        weather.setFeelsLikeC(currentWeather.getDouble("feelslike_c")); // feels like (c)
+        weather.setFeelsLikeF(currentWeather.getDouble("feelslike_f")); // feels like (f)
+        weather.setVisionKM(currentWeather.getDouble("vis_km")); // vision (km)
+        weather.setVisionMiles(currentWeather.getDouble("vis_miles")); // vision (miles)
 
         // creates labels for weather data
-        JLabel locationLabel = new JLabel("Location: " + cityName + ", " + stateName);
-        JLabel temperatureLabel = new JLabel("Temperature: " + temperatureF + "°F");
-        JLabel conditionLabel = new JLabel("Condition: " + condition);
+        JLabel locationLabel = new JLabel("Location: " + weather.getCityName() + ", " + weather.getStateName());
+        JLabel temperatureLabel = new JLabel("Temperature: " + weather.getTemperatureF() + "°F");
+        JLabel conditionLabel = new JLabel("Condition: " + weather.getCondition());
 
         // sets label dimensions/alignment
         locationLabel.setPreferredSize((new Dimension(190, 50)));
