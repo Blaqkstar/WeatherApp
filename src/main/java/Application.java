@@ -1,10 +1,16 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.Flow;
+
+import com.formdev.flatlaf.FlatDarculaLaf;
 import org.json.*;
 
 //TODO: Maybe think about moving weather details into a "Weather" class so that I can just update attributes of an instance of the class when I parse/extract
@@ -13,31 +19,59 @@ public class Application {
     public static void main(String[] args) {
         Weather weather = new Weather(); // declares and instantiates weather
 
-        // -------------------------------------- UI STUFF STARTS HERE!
+        // ----------------------------------------------------------------------------------- START OF UI SECTION
+        // sets look and feel to utilize flatlaf
+        try {
+            UIManager.setLookAndFeel(new FlatDarculaLaf());
+        } catch(Exception ex) {
+            JOptionPane.showMessageDialog(null, "Failed to initialize LaF");
+        }
+        // sets UI font
+        Font uiFont = new Font("SansSerif", Font.BOLD, 14);
+
         // creates main frame
         JFrame applicationFrame = new JFrame("Weather App");
         applicationFrame.setSize(900, 450);
+        applicationFrame.setLayout(new FlowLayout(FlowLayout.CENTER));
+        applicationFrame.setResizable(false);
         applicationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // -------------------------------------- LOCATION PANEL STUFF
         // creates location selection panel
         JPanel locationPanel = new JPanel();
         locationPanel.setLayout(new GridBagLayout());
-        locationPanel.setLayout(new BoxLayout(locationPanel, BoxLayout.Y_AXIS)); // sets locationPanel to a column arrangement
-        locationPanel.setPreferredSize(new Dimension(200,400));
-        locationPanel.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
+        locationPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // sets locationPanel to right-orient
+        locationPanel.setMaximumSize(new Dimension(900,50));
+        //locationPanel.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
+        locationPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
         // contents of locationPanel
         JPanel locationSelectSubPanel = new JPanel(); // creates locationSelectSubPanel
         locationSelectSubPanel.setLayout(new FlowLayout (FlowLayout.RIGHT)); // right-orients locationSelectSubPanel
-        JTextField zipCodeInput = new JTextField(8); // zip code input field
-        //TODO: NEED TO WORK OUT A WAY TO LIMIT ZIP CODE INPUT CHARACTERS TO 5 AND ADD ERROR CHECKING
-        JLabel zipCodeLabel = new JLabel("Zip Code:"); // zip code label
+        locationSelectSubPanel.setPreferredSize(new Dimension(850, 50));
+        locationSelectSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        JTextField searchInput = new JTextField(20); // city/zip code search input field
+        String searchInputDefaultText = "Enter City or ZIP Code"; // default searchbox text
+        searchInput.setText(searchInputDefaultText); // sets default searchbox text
+        // searchInput default text behavior
+        searchInput.addFocusListener(new FocusListener(){
+            @Override public void focusGained(FocusEvent e) {
+                if (searchInput.getText().equals(searchInputDefaultText)){
+                    searchInput.setText("");
+                }
+            }
+
+            @Override public void focusLost(FocusEvent e) {
+                if (searchInput.getText().isEmpty()){
+                    searchInput.setText(searchInputDefaultText);
+                }
+            }
+        });
+
         JButton detectLocationButton = new JButton("Detect Location"); // detect location button
 
         // adds contents to locationSelectSubPanel
-        locationSelectSubPanel.add(zipCodeLabel); // adds zipCodeLabel to locationPanel
-        locationSelectSubPanel.add(zipCodeInput); // adds zipCodeInput to locationPanel
+        locationSelectSubPanel.add(searchInput); // adds searchInput to locationPanel
         locationSelectSubPanel.add(detectLocationButton); // adds detectLocationButton to locationPanel\
 
         // adds locationSelectSubPanel to locationPanel
@@ -47,23 +81,59 @@ public class Application {
         // -------------------------------------- WEATHER PANEL STUFF
         // creates weather display panel
         JPanel weatherPanel = new JPanel();
-        weatherPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        weatherPanel.setLayout(new BoxLayout(weatherPanel, BoxLayout.Y_AXIS));
+        //weatherPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        weatherPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
-        // adds panels to frame
-        applicationFrame.getContentPane().add(locationPanel, BorderLayout.WEST);
-        applicationFrame.getContentPane().add(weatherPanel, BorderLayout.CENTER);
+        // -------------------------------------- LOCATION INFO PANEL STUFF
+        JPanel locationInfoPanel = new JPanel();
+        locationInfoPanel.setPreferredSize(new Dimension(900, 50));
+        locationInfoPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        // contents of locationInfoPanel
+
+        // creates labels for weather data
+        JLabel locationLabel = new JLabel();
+        JLabel temperatureLabel = new JLabel();
+        JLabel conditionLabel = new JLabel();
+
+        // sets label dimensions/alignment
+        locationLabel.setPreferredSize((new Dimension(190, 50)));
+        locationLabel.setHorizontalAlignment(JLabel.RIGHT);
+        temperatureLabel.setPreferredSize(new Dimension(190, 50));
+        temperatureLabel.setHorizontalAlignment(JLabel.CENTER);
+        conditionLabel.setPreferredSize(new Dimension(190, 50));
+        conditionLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        // adds labels to weather panel
+        locationInfoPanel.add(locationLabel);
+        weatherPanel.add(temperatureLabel);
+        weatherPanel.add(conditionLabel);
+
+        // adds all panels to frame
+        applicationFrame.add(locationPanel, BorderLayout.NORTH);
+        applicationFrame.add(locationInfoPanel);
+        applicationFrame.add(weatherPanel);
 
         // toggles frame visiblity
         applicationFrame.setVisible(true);
+
+        // ----------------------------------------------------------------------------------- END OF UI SECTION
 
         // -------------------------------------- BUTTON LOGIC
         detectLocationButton.addActionListener(e -> {
             // gets weather data
             String data = getWeatherData();
             // parses and displays data
-            parseAndDisplayData(data, weather, weatherPanel, locationPanel, locationSelectSubPanel);
+            parseAndDisplayData(data, weather, locationLabel, temperatureLabel, conditionLabel);
         });
 
+        // gets weather data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
+        String data = getWeatherData();
+        // parses and displays data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
+        parseAndDisplayData(data, weather, locationLabel, temperatureLabel, conditionLabel);
+
+        detectLocationButton.requestFocusInWindow(); // sets focus to button so that search box behavior is not broken
     }
 
     // METHODS
@@ -101,9 +171,7 @@ public class Application {
     public static String getLocation() {
         // location detection logic here
         String location = "Undefined Location";
-        // geolocates based on IP address
-
-        // converts IP to a location
+        // resolves location from IP address
         try {
             // creates a URL object from the API URL
             URL url = new URL("http://ip-api.com/json/");
@@ -133,7 +201,7 @@ public class Application {
         return location;
     }
 
-    public static void parseAndDisplayData(String data, Weather weather, JPanel weatherPanel, JPanel locationPanel, JPanel locationSelectSubPanel) {
+    public static void parseAndDisplayData(String data, Weather weather, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel) {
         // parse
         JSONObject jsonObject = new JSONObject(data);
         JSONObject location = jsonObject.getJSONObject("location"); // location header - use this to pull location data
@@ -158,28 +226,9 @@ public class Application {
         weather.setVisionMiles(currentWeather.getDouble("vis_miles")); // vision (miles)
 
         // creates labels for weather data
-        JLabel locationLabel = new JLabel("Location: " + weather.getCityName() + ", " + weather.getStateName());
-        JLabel temperatureLabel = new JLabel("Temperature: " + weather.getTemperatureF() + "°F");
-        JLabel conditionLabel = new JLabel("Condition: " + weather.getCondition());
-
-        // sets label dimensions/alignment
-        locationLabel.setPreferredSize((new Dimension(190, 50)));
-        locationLabel.setHorizontalAlignment(JLabel.RIGHT);
-        temperatureLabel.setPreferredSize(new Dimension(190, 50));
-        temperatureLabel.setHorizontalAlignment(JLabel.CENTER);
-        conditionLabel.setPreferredSize(new Dimension(190, 50));
-        conditionLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        // adds labels to weather panel
-        locationSelectSubPanel.add(locationLabel);
-        weatherPanel.add(temperatureLabel);
-        weatherPanel.add(conditionLabel);
-
-        // refresh the frame
-        locationPanel.revalidate();
-        locationPanel.repaint();
-        weatherPanel.revalidate();
-        weatherPanel.repaint();
+        locationLabel.setText((weather.getCityName() + ", " + weather.getStateName()));
+        temperatureLabel.setText(weather.getTemperatureF() + "°F");
+        conditionLabel.setText(weather.getCondition());
     }
 }
 
