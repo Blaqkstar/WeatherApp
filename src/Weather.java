@@ -3,6 +3,7 @@ public class Weather {
     // attributes
     private String cityName; // name of location
     private String stateName; // name of region/state
+    private int isDay; // day/night boolean
     private double temperatureC; // temp celsius
     private double temperatureF; // temp fahrenheit
     private String condition; // weather condition
@@ -146,5 +147,13 @@ public class Weather {
 
     public void setVisionMiles(double visionMiles) {
         this.visionMiles = visionMiles;
+    }
+
+    public int getDay() {
+        return isDay;
+    }
+
+    public void setDay(int day) {
+        isDay = day;
     }
 }

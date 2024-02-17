@@ -3,19 +3,19 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.Flow;
-
 import com.formdev.flatlaf.FlatDarculaLaf;
 import org.json.*;
 
-//TODO: Maybe think about moving weather details into a "Weather" class so that I can just update attributes of an instance of the class when I parse/extract
 public class Application {
-
+// TODO: Need to work on getting weatherConditionImage to display
     public static void main(String[] args) {
         Weather weather = new Weather(); // declares and instantiates weather
 
@@ -27,7 +27,9 @@ public class Application {
             JOptionPane.showMessageDialog(null, "Failed to initialize LaF");
         }
         // sets UI font
-        Font uiFont = new Font("SansSerif", Font.BOLD, 14);
+        Font locationFont = new Font("SansSerif", Font.BOLD, 16);
+        Font temperatureFont = new Font("SansSerif", Font.BOLD, 22);
+        Font conditionFont = new Font("SansSerif", Font.BOLD, 12);
 
         // creates main frame
         JFrame applicationFrame = new JFrame("Weather App");
@@ -38,21 +40,21 @@ public class Application {
 
         // -------------------------------------- LOCATION PANEL STUFF
         // creates location selection panel
-        JPanel locationPanel = new JPanel();
-        locationPanel.setLayout(new GridBagLayout());
+        JPanel locationPanel = new JPanel(new GridBagLayout());
         locationPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // sets locationPanel to right-orient
-        locationPanel.setMaximumSize(new Dimension(900,50));
+        locationPanel.setMaximumSize(new Dimension(890,50));
         //locationPanel.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
         locationPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
         // contents of locationPanel
         JPanel locationSelectSubPanel = new JPanel(); // creates locationSelectSubPanel
         locationSelectSubPanel.setLayout(new FlowLayout (FlowLayout.RIGHT)); // right-orients locationSelectSubPanel
-        locationSelectSubPanel.setPreferredSize(new Dimension(850, 50));
+        locationSelectSubPanel.setPreferredSize(new Dimension(870, 50));
         locationSelectSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
         JTextField searchInput = new JTextField(20); // city/zip code search input field
         String searchInputDefaultText = "Enter City or ZIP Code"; // default searchbox text
         searchInput.setText(searchInputDefaultText); // sets default searchbox text
+
         // searchInput default text behavior
         searchInput.addFocusListener(new FocusListener(){
             @Override public void focusGained(FocusEvent e) {
@@ -77,41 +79,60 @@ public class Application {
         // adds locationSelectSubPanel to locationPanel
         locationPanel.add(locationSelectSubPanel);
 
+        // -------------------------------------- LOCATION INFO PANEL STUFF
+        JPanel locationInfoPanel = new JPanel();
+        locationInfoPanel.setPreferredSize(new Dimension(880, 300));
+        locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
+        locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+
+        // creates labels for weather data
+        JLabel locationLabel = new JLabel(); // location indicator
+        JLabel temperatureLabel = new JLabel(); // temp indicator
+        JLabel conditionLabel = new JLabel(); // condition indicator
+
+        // sets label alignment and font
+        locationLabel.setHorizontalAlignment(JLabel.CENTER);
+        locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        locationLabel.setFont(locationFont);
+        temperatureLabel.setHorizontalAlignment(JLabel.CENTER);
+        temperatureLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        temperatureLabel.setFont(temperatureFont);
+        conditionLabel.setHorizontalAlignment(JLabel.CENTER);
+        conditionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        conditionLabel.setFont(conditionFont);
+
+        // contents of locationInfoPanel
+        JPanel currentWeatherSubPanel = new JPanel();
+        currentWeatherSubPanel.setLayout(new BoxLayout(currentWeatherSubPanel, BoxLayout.Y_AXIS));
+        currentWeatherSubPanel.setPreferredSize(new Dimension (800, 300));
+        currentWeatherSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //currentWeatherSubPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ImageIcon weatherConditionImage = null;
+        JLabel weatherConditionImageLabel = new JLabel(weatherConditionImage);
+
+        // adds objects to currentWeatherSubPanel
+        currentWeatherSubPanel.add(locationLabel);
+        currentWeatherSubPanel.add(weatherConditionImageLabel);
+        currentWeatherSubPanel.add(conditionLabel);
+        currentWeatherSubPanel.add(temperatureLabel);
+
+        // adds currentWeatherSubPanel to locationInfoPanel
+        locationInfoPanel.add(currentWeatherSubPanel);
+
 
         // -------------------------------------- WEATHER PANEL STUFF
         // creates weather display panel
         JPanel weatherPanel = new JPanel();
         weatherPanel.setLayout(new BoxLayout(weatherPanel, BoxLayout.Y_AXIS));
+        weatherPanel.setPreferredSize(new Dimension(880, 65));
         //weatherPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         weatherPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
-        // -------------------------------------- LOCATION INFO PANEL STUFF
-        JPanel locationInfoPanel = new JPanel();
-        locationInfoPanel.setPreferredSize(new Dimension(900, 50));
-        locationInfoPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-        // contents of locationInfoPanel
+        // weather panel contents
 
-        // creates labels for weather data
-        JLabel locationLabel = new JLabel();
-        JLabel temperatureLabel = new JLabel();
-        JLabel conditionLabel = new JLabel();
-
-        // sets label dimensions/alignment
-        locationLabel.setPreferredSize((new Dimension(190, 50)));
-        locationLabel.setHorizontalAlignment(JLabel.RIGHT);
-        temperatureLabel.setPreferredSize(new Dimension(190, 50));
-        temperatureLabel.setHorizontalAlignment(JLabel.CENTER);
-        conditionLabel.setPreferredSize(new Dimension(190, 50));
-        conditionLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        // adds labels to weather panel
-        locationInfoPanel.add(locationLabel);
-        weatherPanel.add(temperatureLabel);
-        weatherPanel.add(conditionLabel);
 
         // adds all panels to frame
-        applicationFrame.add(locationPanel, BorderLayout.NORTH);
+        applicationFrame.add(locationPanel);
         applicationFrame.add(locationInfoPanel);
         applicationFrame.add(weatherPanel);
 
@@ -125,14 +146,15 @@ public class Application {
             // gets weather data
             String data = getWeatherData();
             // parses and displays data
-            parseAndDisplayData(data, weather, locationLabel, temperatureLabel, conditionLabel);
+            parseAndDisplayData(data, weather, locationLabel, temperatureLabel, conditionLabel, weatherConditionImage);
         });
 
         // gets weather data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
         String data = getWeatherData();
         // parses and displays data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
-        parseAndDisplayData(data, weather, locationLabel, temperatureLabel, conditionLabel);
-
+        parseAndDisplayData(data, weather, locationLabel, temperatureLabel, conditionLabel, weatherConditionImage);
+        locationInfoPanel.revalidate();
+        locationInfoPanel.repaint();
         detectLocationButton.requestFocusInWindow(); // sets focus to button so that search box behavior is not broken
     }
 
@@ -169,7 +191,6 @@ public class Application {
     }
 
     public static String getLocation() {
-        // location detection logic here
         String location = "Undefined Location";
         // resolves location from IP address
         try {
@@ -201,7 +222,7 @@ public class Application {
         return location;
     }
 
-    public static void parseAndDisplayData(String data, Weather weather, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel) {
+    public static void parseAndDisplayData(String data, Weather weather, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel, ImageIcon weatherConditionImage) {
         // parse
         JSONObject jsonObject = new JSONObject(data);
         JSONObject location = jsonObject.getJSONObject("location"); // location header - use this to pull location data
@@ -222,14 +243,423 @@ public class Application {
         weather.setCloudCoverage(currentWeather.getDouble("cloud")); // cloud coverage
         weather.setFeelsLikeC(currentWeather.getDouble("feelslike_c")); // feels like (c)
         weather.setFeelsLikeF(currentWeather.getDouble("feelslike_f")); // feels like (f)
+        weather.setDay(currentWeather.getInt("is_day")); // day/night boolean
         weather.setVisionKM(currentWeather.getDouble("vis_km")); // vision (km)
         weather.setVisionMiles(currentWeather.getDouble("vis_miles")); // vision (miles)
 
-        // creates labels for weather data
+        // updates outputs with weather data
         locationLabel.setText((weather.getCityName() + ", " + weather.getStateName()));
         temperatureLabel.setText(weather.getTemperatureF() + "°F");
         conditionLabel.setText(weather.getCondition());
+        weatherConditionImage = getImageIcon(weather);
+
     }
+
+    public static ImageIcon getImageIcon(Weather weather) {
+        File file = new File("");
+        ImageIcon weatherConditionImage = null;
+
+        try {
+            if (weather.getCondition().equalsIgnoreCase("sunny")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("clear")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equals("Partly cloudy")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("cloudy")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("overcast")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("mist")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy rain possible")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy snow possible")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy sleet possible")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy freezing drizzle possible")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("thundery outbreaks possible")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("blowing snow")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("blizzard")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("fog")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("freezing fog")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy light drizzle")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light drizzle")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("freezing drizzle")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("heavy freezing drizzle")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy light rain")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light rain")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate rain at times")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate rain")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("heavy rain at times")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("heavy rain")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light freezing rain")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy freezing rain")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light sleet")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy sleet")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy light snow")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light snow")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy moderate snow")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate snow")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy heavy snow")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("heavy snow")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("ice pellets")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light rain shower")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy rain shower")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("torrential rain shower")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light sleet showers")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy sleet showers")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light snow showers")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy snow showers")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("light showers of ice pellets")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy showers of ice pellets")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy light rain with thunder")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy rain with thunder")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy light snow with thunder")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }else if (weather.getCondition().equalsIgnoreCase("moderate or heavy snow with thunder")) {
+                file = new File("ENTER FILEPATH HERE");
+            }
+            else {
+                // display image error
+                JOptionPane.showMessageDialog(null, "No Weather Condition Image Available");
+            }
+
+            BufferedImage bufferedImage = ImageIO.read(file);
+            weatherConditionImage = new ImageIcon(bufferedImage);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        return weatherConditionImage;
+    }
+
 }
 
 
