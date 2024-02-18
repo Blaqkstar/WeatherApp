@@ -46,16 +46,15 @@ public class Application {
         JPanel locationPanel = new JPanel(new GridBagLayout());
         locationPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // sets locationPanel to right-orient
         locationPanel.setMaximumSize(new Dimension(890,50));
-        //locationPanel.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
-        locationPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //locationPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
         // contents of locationPanel
         JPanel locationSelectSubPanel = new JPanel(); // creates locationSelectSubPanel
         locationSelectSubPanel.setLayout(new FlowLayout (FlowLayout.RIGHT)); // right-orients locationSelectSubPanel
         locationSelectSubPanel.setPreferredSize(new Dimension(870, 50));
-        locationSelectSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //locationSelectSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
         JTextField searchInput = new JTextField(20); // city/zip code search input field
-        String searchInputDefaultText = "Enter City or ZIP Code"; // default searchbox text
+        String searchInputDefaultText = "Enter City Name or Postal Code"; // default searchbox text
         searchInput.setText(searchInputDefaultText); // sets default searchbox text
 
         // searchInput default text behavior
@@ -84,9 +83,9 @@ public class Application {
 
         // -------------------------------------- LOCATION INFO PANEL STUFF
         JPanel locationInfoPanel = new JPanel();
-        locationInfoPanel.setPreferredSize(new Dimension(880, 380));
+        locationInfoPanel.setPreferredSize(new Dimension(350, 380));
         locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
-        locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
         // creates labels for weather data
         JLabel locationLabel = new JLabel(); // location indicator
@@ -105,14 +104,15 @@ public class Application {
         conditionLabel.setFont(conditionFont);
 
         // contents of locationInfoPanel
-        JPanel currentWeatherSubPanel = new JPanel();
+        JPanel currentWeatherSubPanel = new JPanel() ;
         currentWeatherSubPanel.setLayout(new BoxLayout(currentWeatherSubPanel, BoxLayout.Y_AXIS));
         //currentWeatherSubPanel.setLayout(new BoxLayout(currentWeatherSubPanel, BoxLayout.Y_AXIS));
         currentWeatherSubPanel.setPreferredSize(new Dimension (700, 500));
-        currentWeatherSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //currentWeatherSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
         currentWeatherSubPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         ImageIcon weatherConditionImage = null;
         JLabel weatherConditionImageLabel = new JLabel(weatherConditionImage);
+        weatherConditionImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // creates current weather display boxes and adds their child items
         JPanel locationNameDisplayBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1)) {
@@ -122,15 +122,16 @@ public class Application {
 
         };
         locationNameDisplayBox.setBorder(new EmptyBorder(0,0,0,0));
-        locationNameDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //locationNameDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
         locationNameDisplayBox.add(locationLabel);
-        JPanel weatherImageDisplayBox = new JPanel() {
+        JPanel weatherImageDisplayBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1)) {
             @Override
             public Dimension getMaximumSize() {
                 return getPreferredSize();
             }
         };
-        weatherImageDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        weatherImageDisplayBox.setPreferredSize(new Dimension(250,250));
+        //weatherImageDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
         weatherImageDisplayBox.add(weatherConditionImageLabel);
         JPanel weatherConditionDisplayBox = new JPanel() {
             @Override
@@ -138,7 +139,7 @@ public class Application {
                 return getPreferredSize();
             }
         };;
-        weatherConditionDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //weatherConditionDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
         weatherConditionDisplayBox.add(conditionLabel);
         JPanel temperatureDisplayBox = new JPanel() {
             @Override
@@ -146,7 +147,7 @@ public class Application {
                 return getPreferredSize();
             }
         };;
-        temperatureDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //temperatureDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
         temperatureDisplayBox.add(temperatureLabel);
 
         // adds objects to currentWeatherSubPanel
@@ -158,16 +159,16 @@ public class Application {
         // adds currentWeatherSubPanel to locationInfoPanel
         locationInfoPanel.add(currentWeatherSubPanel);
 
-        // -------------------------------------- WEATHER PANEL STUFF
+        // -------------------------------------- FORECAST PANEL STUFF
         // creates weather display panel
         JPanel forecastPanel = new JPanel();
         forecastPanel.setLayout(new BoxLayout(forecastPanel, BoxLayout.Y_AXIS));
         forecastPanel.setPreferredSize(new Dimension(880, 90));
         //forecastPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        forecastPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+        //forecastPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
         // weather panel contents
-
+        //TODO: Get 5-day forecast panel in place
 
         // adds all panels to frame
         applicationFrame.add(locationPanel);
@@ -205,7 +206,9 @@ public class Application {
 
         locationInfoPanel.revalidate();
         locationInfoPanel.repaint();
-        detectLocationButton.requestFocusInWindow(); // sets focus to button so that search box behavior is not broken
+        //detectLocationButton.requestFocusInWindow(); // sets focus to button so that search box behavior is not broken
+        applicationFrame.getRootPane().requestFocus();
+        applicationFrame.getRootPane().setDefaultButton(detectLocationButton);
     }
 
     // METHODS
@@ -215,6 +218,7 @@ public class Application {
             if (location.isEmpty()) {
                 location = getLocation(); // location
             }
+            location = location.replace(" ", "+");
 
             // creates a URL object from the API URL
             URL url = new URL("http://api.weatherapi.com/v1/current.json?key=" + weatherAPIKey + "&q=" + location + "&aqi=no");
@@ -363,6 +367,14 @@ public class Application {
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy rain possible")) {
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/113.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/113.png");
+                }
+            }
+            else if (weather.getCondition().equalsIgnoreCase("patchy rain nearby")) {
                 if (weather.getDay() == 0) {
                     file = new File("resources/images/WeatherIcons/night/113.png");
                 }
