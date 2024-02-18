@@ -4,6 +4,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,8 +14,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
-
 import com.formdev.flatlaf.FlatDarculaLaf;
 import org.json.*;
 
@@ -21,194 +21,214 @@ public class Application {
 // TODO: Need to work on getting weatherConditionImage to display
     public static void main(String[] args) {
         Weather weather = new Weather(); // declares and instantiates weather
+        int[] cOrF = new int[1]; // holds binary value for determining whether user has selected C or F
 
         // ----------------------------------------------------------------------------------- START OF UI SECTION
         // sets look and feel to utilize flatlaf
-        try {
-            UIManager.setLookAndFeel(new FlatDarculaLaf());
-        } catch(Exception ex) {
-            JOptionPane.showMessageDialog(null, "Failed to initialize LaF");
-        }
-        // sets UI font
-        Font locationFont = new Font("SansSerif", Font.BOLD, 16);
-        Font temperatureFont = new Font("SansSerif", Font.BOLD, 22);
-        Font conditionFont = new Font("SansSerif", Font.BOLD, 12);
-
-        // creates main frame
-        JFrame applicationFrame = new JFrame("Weather App");
-        applicationFrame.setSize(900, 600);
-        applicationFrame.setLayout(new FlowLayout(FlowLayout.CENTER));
-        applicationFrame.setResizable(false);
-        applicationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // -------------------------------------- LOCATION PANEL STUFF
-        // creates location selection panel
-        JPanel locationPanel = new JPanel(new GridBagLayout());
-        locationPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // sets locationPanel to right-orient
-        locationPanel.setMaximumSize(new Dimension(890,50));
-        //locationPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-
-        // contents of locationPanel
-        JPanel locationSelectSubPanel = new JPanel(); // creates locationSelectSubPanel
-        locationSelectSubPanel.setLayout(new FlowLayout (FlowLayout.RIGHT)); // right-orients locationSelectSubPanel
-        locationSelectSubPanel.setPreferredSize(new Dimension(870, 50));
-        //locationSelectSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-        JTextField searchInput = new JTextField(20); // city/zip code search input field
-        String searchInputDefaultText = "Enter City Name or Postal Code"; // default searchbox text
-        searchInput.setText(searchInputDefaultText); // sets default searchbox text
-
-        // searchInput default text behavior
-        searchInput.addFocusListener(new FocusListener(){
-            @Override public void focusGained(FocusEvent e) {
-                if (searchInput.getText().equals(searchInputDefaultText)){
-                    searchInput.setText("");
-                }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(new FlatDarculaLaf());
+            } catch(Exception ex) {
+                JOptionPane.showMessageDialog(null, "Failed to initialize LaF");
             }
+            // sets UI font
+            Font locationFont = new Font("SansSerif", Font.BOLD, 16);
+            Font temperatureFont = new Font("SansSerif", Font.BOLD, 22);
+            Font conditionFont = new Font("SansSerif", Font.BOLD, 12);
 
-            @Override public void focusLost(FocusEvent e) {
-                if (searchInput.getText().isEmpty()){
-                    searchInput.setText(searchInputDefaultText);
+            // creates main frame
+            JFrame applicationFrame = new JFrame("Weather App");
+            applicationFrame.setSize(900, 600);
+            applicationFrame.setLayout(new FlowLayout(FlowLayout.CENTER));
+            applicationFrame.setResizable(false);
+            applicationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            // -------------------------------------- LOCATION PANEL STUFF
+            // creates location selection panel
+            JPanel locationPanel = new JPanel(new GridBagLayout());
+            locationPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // sets locationPanel to right-orient
+            locationPanel.setMaximumSize(new Dimension(890,50));
+            //locationPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+
+            // contents of locationPanel
+            JPanel locationSelectSubPanel = new JPanel(); // creates locationSelectSubPanel
+            locationSelectSubPanel.setLayout(new FlowLayout (FlowLayout.RIGHT)); // right-orients locationSelectSubPanel
+            locationSelectSubPanel.setPreferredSize(new Dimension(870, 50));
+            //locationSelectSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            JTextField searchInput = new JTextField(20); // city/zip code search input field
+            String searchInputDefaultText = "Enter City Name or Postal Code"; // default searchbox text
+            searchInput.setText(searchInputDefaultText); // sets default searchbox text
+
+            // searchInput default text behavior
+            searchInput.addFocusListener(new FocusListener(){
+                @Override public void focusGained(FocusEvent e) {
+                    if (searchInput.getText().equals(searchInputDefaultText)){
+                        searchInput.setText("");
+                    }
                 }
-            }
+
+                @Override public void focusLost(FocusEvent e) {
+                    if (searchInput.getText().isEmpty()){
+                        searchInput.setText(searchInputDefaultText);
+                    }
+                }
+            });
+
+            JButton detectLocationButton = new JButton("Detect Location"); // detect location button
+
+            // adds contents to locationSelectSubPanel
+            locationSelectSubPanel.add(searchInput); // adds searchInput to locationPanel
+            locationSelectSubPanel.add(detectLocationButton); // adds detectLocationButton to locationPanel\
+
+            // adds locationSelectSubPanel to locationPanel
+            locationPanel.add(locationSelectSubPanel);
+
+            // -------------------------------------- LOCATION INFO PANEL STUFF
+            JPanel locationInfoPanel = new JPanel();
+            locationInfoPanel.setPreferredSize(new Dimension(350, 380));
+            locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
+            //locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+
+            // creates labels for weather data
+            JLabel locationLabel = new JLabel(); // location indicator
+            JLabel temperatureLabel = new JLabel(); // temp indicator
+            JLabel conditionLabel = new JLabel(); // condition indicator
+
+            // sets label alignment and font
+            locationLabel.setHorizontalAlignment(JLabel.CENTER);
+            locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            locationLabel.setFont(locationFont);
+            temperatureLabel.setHorizontalAlignment(JLabel.CENTER);
+            temperatureLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            temperatureLabel.setFont(temperatureFont);
+            conditionLabel.setHorizontalAlignment(JLabel.CENTER);
+            conditionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            conditionLabel.setFont(conditionFont);
+
+            // contents of locationInfoPanel
+            JPanel currentWeatherSubPanel = new JPanel() ;
+            currentWeatherSubPanel.setLayout(new BoxLayout(currentWeatherSubPanel, BoxLayout.Y_AXIS));
+            //currentWeatherSubPanel.setLayout(new BoxLayout(currentWeatherSubPanel, BoxLayout.Y_AXIS));
+            currentWeatherSubPanel.setPreferredSize(new Dimension (700, 500));
+            //currentWeatherSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            currentWeatherSubPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            ImageIcon weatherConditionImage = null;
+            JLabel weatherConditionImageLabel = new JLabel(weatherConditionImage);
+            weatherConditionImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // creates current weather display boxes and adds their child items
+            JPanel locationNameDisplayBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1)) {
+                @Override public Dimension getMaximumSize(){
+                    return getPreferredSize();
+                }
+
+            };
+            locationNameDisplayBox.setBorder(new EmptyBorder(0,0,0,0));
+            //locationNameDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            locationNameDisplayBox.add(locationLabel);
+            JPanel weatherImageDisplayBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1)) {
+                @Override
+                public Dimension getMaximumSize() {
+                    return getPreferredSize();
+                }
+            };
+            weatherImageDisplayBox.setPreferredSize(new Dimension(250,250));
+            //weatherImageDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            weatherImageDisplayBox.add(weatherConditionImageLabel);
+            JPanel weatherConditionDisplayBox = new JPanel() {
+                @Override
+                public Dimension getMaximumSize() {
+                    return getPreferredSize();
+                }
+            };;
+            //weatherConditionDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            weatherConditionDisplayBox.add(conditionLabel);
+            JPanel temperatureDisplayBox = new JPanel() {
+                @Override
+                public Dimension getMaximumSize() {
+                    return getPreferredSize();
+                }
+            };;
+            //temperatureDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            temperatureDisplayBox.add(temperatureLabel);
+
+            // adds objects to currentWeatherSubPanel
+            currentWeatherSubPanel.add(locationNameDisplayBox);
+            currentWeatherSubPanel.add(temperatureDisplayBox);
+            currentWeatherSubPanel.add(weatherImageDisplayBox);
+            currentWeatherSubPanel.add(weatherConditionDisplayBox);
+
+            // adds currentWeatherSubPanel to locationInfoPanel
+            locationInfoPanel.add(currentWeatherSubPanel);
+
+            // -------------------------------------- FORECAST PANEL STUFF
+            // creates weather display panel
+            JPanel forecastPanel = new JPanel();
+            forecastPanel.setLayout(new BoxLayout(forecastPanel, BoxLayout.Y_AXIS));
+            forecastPanel.setPreferredSize(new Dimension(880, 90));
+            //forecastPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+            //forecastPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+
+            // weather panel contents
+            //TODO: Get 5-day forecast panel in place
+
+            // adds all panels to frame
+            applicationFrame.add(locationPanel);
+            applicationFrame.add(locationInfoPanel);
+            applicationFrame.add(forecastPanel);
+
+            // toggles frame visiblity
+            applicationFrame.setVisible(true);
+
+            // ----------------------------------------------------------------------------------- END OF UI SECTION
+            int temperatureStyle;
+            final String[] locationArray = new String[1];
+            String location = "";
+
+
+            // -------------------------------------- BUTTON LOGIC
+            // temperature label C/F switcher
+            temperatureLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (cOrF[0] <= 0){
+                        cOrF[0] = 1;
+                    }
+                    else {
+                        cOrF[0] = 0;
+                    }
+                }
+            });
+            temperatureStyle = cOrF[0]; // sets variable for use in other methods
+
+            // detect button
+            detectLocationButton.addActionListener(e -> {
+                if (searchInput.getText().equals(searchInputDefaultText)) {
+                    locationArray[0] = "";
+                }
+                else {
+                    locationArray[0] = searchInput.getText();
+                }
+                String locationString = locationArray[0];
+                // gets weather data
+                String data = getWeatherData(locationString);
+                // parses and displays data
+                parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel, weatherConditionImage);
+            });
+
+
+            // gets weather data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
+            String data = getWeatherData(location);
+            // parses and displays data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
+            parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel, weatherConditionImage);
+
+            locationInfoPanel.revalidate();
+            locationInfoPanel.repaint();
+            //detectLocationButton.requestFocusInWindow(); // sets focus to button so that search box behavior is not broken
+            applicationFrame.getRootPane().requestFocus();
+            applicationFrame.getRootPane().setDefaultButton(detectLocationButton);
         });
 
-        JButton detectLocationButton = new JButton("Detect Location"); // detect location button
-
-        // adds contents to locationSelectSubPanel
-        locationSelectSubPanel.add(searchInput); // adds searchInput to locationPanel
-        locationSelectSubPanel.add(detectLocationButton); // adds detectLocationButton to locationPanel\
-
-        // adds locationSelectSubPanel to locationPanel
-        locationPanel.add(locationSelectSubPanel);
-
-        // -------------------------------------- LOCATION INFO PANEL STUFF
-        JPanel locationInfoPanel = new JPanel();
-        locationInfoPanel.setPreferredSize(new Dimension(350, 380));
-        locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
-        //locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-
-        // creates labels for weather data
-        JLabel locationLabel = new JLabel(); // location indicator
-        JLabel temperatureLabel = new JLabel(); // temp indicator
-        JLabel conditionLabel = new JLabel(); // condition indicator
-
-        // sets label alignment and font
-        locationLabel.setHorizontalAlignment(JLabel.CENTER);
-        locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        locationLabel.setFont(locationFont);
-        temperatureLabel.setHorizontalAlignment(JLabel.CENTER);
-        temperatureLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        temperatureLabel.setFont(temperatureFont);
-        conditionLabel.setHorizontalAlignment(JLabel.CENTER);
-        conditionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        conditionLabel.setFont(conditionFont);
-
-        // contents of locationInfoPanel
-        JPanel currentWeatherSubPanel = new JPanel() ;
-        currentWeatherSubPanel.setLayout(new BoxLayout(currentWeatherSubPanel, BoxLayout.Y_AXIS));
-        //currentWeatherSubPanel.setLayout(new BoxLayout(currentWeatherSubPanel, BoxLayout.Y_AXIS));
-        currentWeatherSubPanel.setPreferredSize(new Dimension (700, 500));
-        //currentWeatherSubPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-        currentWeatherSubPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        ImageIcon weatherConditionImage = null;
-        JLabel weatherConditionImageLabel = new JLabel(weatherConditionImage);
-        weatherConditionImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // creates current weather display boxes and adds their child items
-        JPanel locationNameDisplayBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1)) {
-            @Override public Dimension getMaximumSize(){
-                return getPreferredSize();
-            }
-
-        };
-        locationNameDisplayBox.setBorder(new EmptyBorder(0,0,0,0));
-        //locationNameDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-        locationNameDisplayBox.add(locationLabel);
-        JPanel weatherImageDisplayBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1)) {
-            @Override
-            public Dimension getMaximumSize() {
-                return getPreferredSize();
-            }
-        };
-        weatherImageDisplayBox.setPreferredSize(new Dimension(250,250));
-        //weatherImageDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-        weatherImageDisplayBox.add(weatherConditionImageLabel);
-        JPanel weatherConditionDisplayBox = new JPanel() {
-            @Override
-            public Dimension getMaximumSize() {
-                return getPreferredSize();
-            }
-        };;
-        //weatherConditionDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-        weatherConditionDisplayBox.add(conditionLabel);
-        JPanel temperatureDisplayBox = new JPanel() {
-            @Override
-            public Dimension getMaximumSize() {
-                return getPreferredSize();
-            }
-        };;
-        //temperatureDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-        temperatureDisplayBox.add(temperatureLabel);
-
-        // adds objects to currentWeatherSubPanel
-        currentWeatherSubPanel.add(locationNameDisplayBox);
-        currentWeatherSubPanel.add(temperatureDisplayBox);
-        currentWeatherSubPanel.add(weatherImageDisplayBox);
-        currentWeatherSubPanel.add(weatherConditionDisplayBox);
-
-        // adds currentWeatherSubPanel to locationInfoPanel
-        locationInfoPanel.add(currentWeatherSubPanel);
-
-        // -------------------------------------- FORECAST PANEL STUFF
-        // creates weather display panel
-        JPanel forecastPanel = new JPanel();
-        forecastPanel.setLayout(new BoxLayout(forecastPanel, BoxLayout.Y_AXIS));
-        forecastPanel.setPreferredSize(new Dimension(880, 90));
-        //forecastPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        //forecastPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
-
-        // weather panel contents
-        //TODO: Get 5-day forecast panel in place
-
-        // adds all panels to frame
-        applicationFrame.add(locationPanel);
-        applicationFrame.add(locationInfoPanel);
-        applicationFrame.add(forecastPanel);
-
-        // toggles frame visiblity
-        applicationFrame.setVisible(true);
-
-        // ----------------------------------------------------------------------------------- END OF UI SECTION
-
-        final String[] locationArray = new String[1];
-        String location = "";
-
-
-        // -------------------------------------- BUTTON LOGIC
-        detectLocationButton.addActionListener(e -> {
-            if (searchInput.getText().equals(searchInputDefaultText)) {
-                locationArray[0] = "";
-            }
-            else {
-                locationArray[0] = searchInput.getText();
-            }
-            String locationString = locationArray[0];
-            // gets weather data
-            String data = getWeatherData(locationString);
-            // parses and displays data
-            parseAndDisplayData(data, weather, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel, weatherConditionImage);
-        });
-
-        // gets weather data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
-        String data = getWeatherData(location);
-        // parses and displays data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
-        parseAndDisplayData(data, weather, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel, weatherConditionImage);
-
-        locationInfoPanel.revalidate();
-        locationInfoPanel.repaint();
-        //detectLocationButton.requestFocusInWindow(); // sets focus to button so that search box behavior is not broken
-        applicationFrame.getRootPane().requestFocus();
-        applicationFrame.getRootPane().setDefaultButton(detectLocationButton);
     }
 
     // METHODS
@@ -221,7 +241,7 @@ public class Application {
             location = location.replace(" ", "+");
 
             // creates a URL object from the API URL
-            URL url = new URL("http://api.weatherapi.com/v1/current.json?key=" + weatherAPIKey + "&q=" + location + "&aqi=no");
+            URL url = new URL("https://api.weatherapi.com/v1/current.json?key=" + weatherAPIKey + "&q=" + location + "&aqi=no");
 
             // creates a buffered reader
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -278,7 +298,7 @@ public class Application {
         return location;
     }
 
-    public static void parseAndDisplayData(String data, Weather weather, JPanel locationInfoPanel, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel, JLabel weatherConditionImageLabel, ImageIcon weatherConditionImage) {
+    public static void parseAndDisplayData(String data, Weather weather, Integer temperatureStyle, JPanel locationInfoPanel, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel, JLabel weatherConditionImageLabel, ImageIcon weatherConditionImage) {
         // parse
         JSONObject jsonObject = new JSONObject(data);
         JSONObject location = jsonObject.getJSONObject("location"); // location header - use this to pull location data
@@ -305,7 +325,14 @@ public class Application {
 
         // updates outputs with weather data
         locationLabel.setText((weather.getCityName() + ", " + weather.getStateName()));
-        temperatureLabel.setText(weather.getTemperatureF() + "°F");
+        // checks whether user has chosen to use C or F
+        if (temperatureStyle == 0) {
+            temperatureLabel.setText(weather.getTemperatureF() + "°F");
+        }
+        else {
+            temperatureLabel.setText(weather.getTemperatureC() + "°C");
+        }
+
         conditionLabel.setText(weather.getCondition());
         weatherConditionImage = getImageIcon(weather);
         weatherConditionImageLabel.setIcon(weatherConditionImage);
