@@ -18,7 +18,6 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import org.json.*;
 
 public class Application {
-// TODO: Need to work on getting weatherConditionImage to display
     public static void main(String[] args) {
         Weather weather = new Weather(); // declares and instantiates weather
         int[] cOrF = new int[1]; // holds binary value for determining whether user has selected C or F
@@ -34,7 +33,7 @@ public class Application {
             // sets UI font
             Font locationFont = new Font("SansSerif", Font.BOLD, 16);
             Font temperatureFont = new Font("SansSerif", Font.BOLD, 22);
-            Font conditionFont = new Font("SansSerif", Font.BOLD, 12);
+            Font conditionFont = new Font("SansSerif", Font.BOLD, 14);
 
             // creates main frame
             JFrame applicationFrame = new JFrame("Weather App");
@@ -85,7 +84,7 @@ public class Application {
 
             // -------------------------------------- LOCATION INFO PANEL STUFF
             JPanel locationInfoPanel = new JPanel();
-            locationInfoPanel.setPreferredSize(new Dimension(550, 380));
+            locationInfoPanel.setPreferredSize(new Dimension(550, 500));
             locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
             //locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
@@ -123,7 +122,7 @@ public class Application {
                 }
 
             };
-            locationNameDisplayBox.setPreferredSize(new Dimension(600,30));
+            locationNameDisplayBox.setPreferredSize(new Dimension(600,22));
             locationNameDisplayBox.setBorder(new EmptyBorder(0,0,0,0));
             //locationNameDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
             locationNameDisplayBox.add(locationLabel);
@@ -133,7 +132,7 @@ public class Application {
                     return getPreferredSize();
                 }
             };
-            weatherImageDisplayBox.setPreferredSize(new Dimension(250,220));
+            weatherImageDisplayBox.setPreferredSize(new Dimension(250,200));
             //weatherImageDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
             weatherImageDisplayBox.add(weatherConditionImageLabel);
             JPanel weatherConditionDisplayBox = new JPanel();
