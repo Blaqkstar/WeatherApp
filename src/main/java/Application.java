@@ -85,7 +85,7 @@ public class Application {
 
             // -------------------------------------- LOCATION INFO PANEL STUFF
             JPanel locationInfoPanel = new JPanel();
-            locationInfoPanel.setPreferredSize(new Dimension(350, 380));
+            locationInfoPanel.setPreferredSize(new Dimension(550, 380));
             locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
             //locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
@@ -123,6 +123,7 @@ public class Application {
                 }
 
             };
+            locationNameDisplayBox.setPreferredSize(new Dimension(600,30));
             locationNameDisplayBox.setBorder(new EmptyBorder(0,0,0,0));
             //locationNameDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
             locationNameDisplayBox.add(locationLabel);
@@ -132,15 +133,16 @@ public class Application {
                     return getPreferredSize();
                 }
             };
-            weatherImageDisplayBox.setPreferredSize(new Dimension(250,250));
+            weatherImageDisplayBox.setPreferredSize(new Dimension(250,220));
             //weatherImageDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
             weatherImageDisplayBox.add(weatherConditionImageLabel);
-            JPanel weatherConditionDisplayBox = new JPanel() {
+            JPanel weatherConditionDisplayBox = new JPanel();
+            /*JPanel weatherConditionDisplayBox = new JPanel() {
                 @Override
                 public Dimension getMaximumSize() {
                     return getPreferredSize();
                 }
-            };;
+            };;*/
             //weatherConditionDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
             weatherConditionDisplayBox.add(conditionLabel);
             JPanel temperatureDisplayBox = new JPanel() {
@@ -340,6 +342,7 @@ public class Application {
         locationInfoPanel.repaint();
     }
 
+    //TODO: NEED TO SET UP THE REST OF THE WEATHER ICONS
     public static ImageIcon getImageIcon(Weather weather) {
         File file = new File("");
         ImageIcon weatherConditionImage = null;
@@ -363,381 +366,386 @@ public class Application {
             }
             else if (weather.getCondition().equals("Partly cloudy")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/116.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/116.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("cloudy")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/119.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/119.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("overcast")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/122.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/122.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("mist")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/143.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/143.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy rain possible")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/176.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/176.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy rain nearby")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/176.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/176.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy snow possible")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/179.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/179.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy sleet possible")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/182.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/182.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy freezing drizzle possible")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/185.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/185.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("thundery outbreaks possible")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/200.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/200.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("blowing snow")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/227.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/227.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("blizzard")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/230.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/230.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("fog")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/248.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/248.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("freezing fog")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/260.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/260.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy light drizzle")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/263.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/263.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light drizzle")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/266.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/266.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("freezing drizzle")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/281.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/281.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("heavy freezing drizzle")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/284.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/284.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy light rain")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/293.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/293.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light rain")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/296.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/296.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate rain at times")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/299.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/299.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate rain")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/302.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/302.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("heavy rain at times")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/305.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/305.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("heavy rain")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/308.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/308.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light freezing rain")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/311.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/311.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate or heavy freezing rain")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/314.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/314.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light sleet")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/317.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/317.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate or heavy sleet")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/320.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/320.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy light snow")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/323.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/323.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light snow")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/326.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/326.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy moderate snow")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/329.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/329.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate snow")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/332.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/332.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy heavy snow")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/335.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/335.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("heavy snow")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/338.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/338.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("ice pellets")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/350.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/350.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light rain shower")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/353.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/353.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate or heavy rain shower")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/356.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/356.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("torrential rain shower")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/359.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/359.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light sleet showers")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/362.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/362.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate or heavy sleet showers")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/365.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/365.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light snow showers")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/368.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/368.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate or heavy snow showers")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/371.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/371.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("light showers of ice pellets")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/374.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/374.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate or heavy showers of ice pellets")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/377.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/377.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy light rain with thunder")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/386.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/386.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("moderate or heavy rain with thunder")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/389.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/389.png");
                 }
             }
             else if (weather.getCondition().equalsIgnoreCase("patchy light snow with thunder")) {
                 if (weather.getDay() == 0) {
-                    file = new File("resources/images/WeatherIcons/night/113.png");
+                    file = new File("resources/images/WeatherIcons/night/392.png");
                 }
                 else {
-                    file = new File("resources/images/WeatherIcons/day/113.png");
+                    file = new File("resources/images/WeatherIcons/day/392.png");
                 }
             }else if (weather.getCondition().equalsIgnoreCase("moderate or heavy snow with thunder")) {
-                file = new File("ENTER FILEPATH HERE");
+                if (weather.getDay() == 0) {
+                    file = new File("resources/images/WeatherIcons/night/395.png");
+                }
+                else {
+                    file = new File("resources/images/WeatherIcons/day/395.png");
+                }
             }
             else {
                 // display image error
