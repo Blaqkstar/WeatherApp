@@ -40,6 +40,7 @@ public class Application {
             applicationFrame.setSize(900, 600);
             applicationFrame.setLayout(new FlowLayout(FlowLayout.CENTER));
             applicationFrame.setResizable(false);
+            applicationFrame.setLocationRelativeTo(null); // forces app to launch centered on screen
             applicationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             // -------------------------------------- LOCATION PANEL STUFF
@@ -61,7 +62,7 @@ public class Application {
             // searchInput default text behavior
             searchInput.addFocusListener(new FocusListener(){
                 @Override public void focusGained(FocusEvent e) {
-                    if (searchInput.getText().equals(searchInputDefaultText)){
+                    if (searchInput.getText().contains(searchInputDefaultText)){
                         searchInput.setText("");
                     }
                 }
@@ -84,7 +85,7 @@ public class Application {
 
             // -------------------------------------- LOCATION INFO PANEL STUFF
             JPanel locationInfoPanel = new JPanel();
-            locationInfoPanel.setPreferredSize(new Dimension(550, 500));
+            locationInfoPanel.setPreferredSize(new Dimension(550, 300));
             locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
             //locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
@@ -149,7 +150,7 @@ public class Application {
                 public Dimension getMaximumSize() {
                     return getPreferredSize();
                 }
-            };;
+            };
             //temperatureDisplayBox.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
             temperatureDisplayBox.add(temperatureLabel);
 
@@ -165,13 +166,43 @@ public class Application {
             // -------------------------------------- FORECAST PANEL STUFF
             // creates weather display panel
             JPanel forecastPanel = new JPanel();
-            forecastPanel.setLayout(new BoxLayout(forecastPanel, BoxLayout.Y_AXIS));
-            forecastPanel.setPreferredSize(new Dimension(880, 90));
-            //forecastPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-            //forecastPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            forecastPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+            forecastPanel.setPreferredSize(new Dimension(880, 150));
+            forecastPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
             // weather panel contents
-            //TODO: Get 5-day forecast panel in place
+            // DAY ONE
+            JPanel dayOnePanel = new JPanel();
+            dayOnePanel.setAlignmentX(Component.CENTER_ALIGNMENT); // centers panel in parent container
+            dayOnePanel.setPreferredSize(new Dimension(90, 130));
+            dayOnePanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            // DAY TWO
+            JPanel dayTwoPanel = new JPanel();
+            dayTwoPanel.setAlignmentX(Component.CENTER_ALIGNMENT); // centers panel in parent container
+            dayTwoPanel.setPreferredSize(new Dimension(90, 130));
+            dayTwoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            // DAY THREE
+            JPanel dayThreePanel = new JPanel();
+            dayThreePanel.setAlignmentX(Component.CENTER_ALIGNMENT); // centers panel in parent container
+            dayThreePanel.setPreferredSize(new Dimension(90, 130));
+            dayThreePanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            // DAY FOUR
+            JPanel dayFourPanel = new JPanel();
+            dayFourPanel.setAlignmentX(Component.CENTER_ALIGNMENT); // centers panel in parent container
+            dayFourPanel.setPreferredSize(new Dimension(90, 130));
+            dayFourPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+            // DAY FIVE
+            JPanel dayFivePanel = new JPanel();
+            dayFivePanel.setAlignmentX(Component.CENTER_ALIGNMENT); // centers panel in parent container
+            dayFivePanel.setPreferredSize(new Dimension(90, 130));
+            dayFivePanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
+
+            // adds panels to forecastPanel
+            forecastPanel.add(dayOnePanel);
+            forecastPanel.add(dayTwoPanel);
+            forecastPanel.add(dayThreePanel);
+            forecastPanel.add(dayFourPanel);
+            forecastPanel.add(dayFivePanel);
 
             // adds all panels to frame
             applicationFrame.add(locationPanel);
@@ -181,7 +212,7 @@ public class Application {
             // toggles frame visiblity
             applicationFrame.setVisible(true);
 
-            // ----------------------------------------------------------------------------------- END OF UI SECTION
+            //TODO ----------------------------------------------------------------------------------- END OF UI SECTION
             int temperatureStyle;
             final String[] locationArray = new String[1];
             String location = "";
@@ -212,16 +243,16 @@ public class Application {
                 }
                 String locationString = locationArray[0];
                 // gets weather data
-                String data = getWeatherData(locationString);
+                String data = getCurrentWeatherData(locationString);
                 // parses and displays data
-                parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel, weatherConditionImage);
+                parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel);
             });
 
 
             // gets weather data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
-            String data = getWeatherData(location);
+            String data = getCurrentWeatherData(location);
             // parses and displays data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
-            parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel, weatherConditionImage);
+            parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel);
 
             locationInfoPanel.revalidate();
             locationInfoPanel.repaint();
@@ -233,7 +264,8 @@ public class Application {
     }
 
     // METHODS
-    public static String getWeatherData(String location) {
+    public static String getCurrentWeatherData(String location) {
+        StringBuilder sb = new StringBuilder();
         try {
             String weatherAPIKey = "8bb46e6e7ee445d3875222324240702"; // key
             if (location.isEmpty()) {
@@ -241,26 +273,60 @@ public class Application {
             }
             location = location.replace(" ", "+");
 
-            // creates a URL object from the API URL
-            URL url = new URL("https://api.weatherapi.com/v1/current.json?key=" + weatherAPIKey + "&q=" + location + "&aqi=no");
+            // creates a URL object for CURRENT WEATHER from the API URL
+            URL currentWeatherURL = new URL("https://api.weatherapi.com/v1/current.json?key=" + weatherAPIKey + "&q=" + location + "&aqi=no");
 
-            // creates a buffered reader
-            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            // creates a buffered reader and passes current weather url to input params
+            BufferedReader reader = new BufferedReader(new InputStreamReader(currentWeatherURL.openStream()));
 
             // reads data
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while((line = reader.readLine()) != null) {
-                sb.append(line);
+            // CURRENT WEATHER
+            String currentWeatherSBReadLine;
+            while((currentWeatherSBReadLine = reader.readLine()) != null) {
+                sb.append(currentWeatherSBReadLine);
             }
             reader.close();
-
-            return sb.toString();
         } catch (MalformedURLException e) {
-            JOptionPane.showMessageDialog(null,"The URL is not formatted correctly.");
+            JOptionPane.showMessageDialog(null,"Unable to fetch current weather (error: bad URL)");
             e.printStackTrace();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null,"An error occurred while reading from the URL.");
+            JOptionPane.showMessageDialog(null,"An error occurred while reading from the current weather URL.");
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+    }
+
+
+    public static String getWeatherForecastData(String location) {
+        try {
+            String weatherAPIKey = "8bb46e6e7ee445d3875222324240702"; // key
+            if (location.isEmpty()) {
+                location = getLocation(); // location
+            }
+            location = location.replace(" ", "+");
+
+            // creates a URL object for 5-DAY FORECAST from the API URL
+            URL forecastURL = new URL("https://api.weatherapi.com/v1/forecast.json?key=" + weatherAPIKey + "&q=" + location + "&days=5&aqi=yes&alerts=no");
+
+            // creates a buffered reader and passes forecast url into input params
+            BufferedReader forecastReader = new BufferedReader(new InputStreamReader(forecastURL.openStream()));
+
+            // reads data
+            // FORECAST
+            String forecastSBReadLine;
+            StringBuilder forecastSB = new StringBuilder();
+            while((forecastSBReadLine = forecastReader.readLine()) != null) {
+                forecastSB.append(forecastSBReadLine);
+            }
+            forecastReader.close();
+
+            return forecastSB.toString();
+        } catch (MalformedURLException e) {
+            JOptionPane.showMessageDialog(null,"Unable to fetch weather forecast (error: bad URL)");
+            e.printStackTrace();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null,"An error occurred while reading from the weather forecast URL.");
             e.printStackTrace();
         }
 
@@ -299,13 +365,13 @@ public class Application {
         return location;
     }
 
-    public static void parseAndDisplayData(String data, Weather weather, Integer temperatureStyle, JPanel locationInfoPanel, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel, JLabel weatherConditionImageLabel, ImageIcon weatherConditionImage) {
+    public static void parseAndDisplayData(String data, Weather weather, Integer temperatureStyle, JPanel locationInfoPanel, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel, JLabel weatherConditionImageLabel) {
         // parse
         JSONObject jsonObject = new JSONObject(data);
         JSONObject location = jsonObject.getJSONObject("location"); // location header - use this to pull location data
         JSONObject currentWeather = jsonObject.getJSONObject("current"); // current header - use this to pull current weather data
 
-        // extract details
+        // extract current weather details
         weather.setCityName(location.getString("name")); // name of location
         weather.setStateName(location.getString("region")); // name of region/state
         weather.setTemperatureC(currentWeather.getDouble("temp_c")); // temp celsius
@@ -323,19 +389,22 @@ public class Application {
         weather.setDay(currentWeather.getInt("is_day")); // day/night boolean
         weather.setVisionKM(currentWeather.getDouble("vis_km")); // vision (km)
         weather.setVisionMiles(currentWeather.getDouble("vis_miles")); // vision (miles)
+        
 
         // updates outputs with weather data
         locationLabel.setText((weather.getCityName() + ", " + weather.getStateName()));
         // checks whether user has chosen to use C or F
-        if (temperatureStyle == 0) {
+        if (temperatureStyle.equals(0)) {
             temperatureLabel.setText(weather.getTemperatureF() + "°F");
+            locationInfoPanel.revalidate();
+            locationInfoPanel.repaint();
         }
         else {
             temperatureLabel.setText(weather.getTemperatureC() + "°C");
         }
 
         conditionLabel.setText(weather.getCondition());
-        weatherConditionImage = getImageIcon(weather);
+        ImageIcon weatherConditionImage = getImageIcon(weather);
         weatherConditionImageLabel.setIcon(weatherConditionImage);
         locationInfoPanel.revalidate();
         locationInfoPanel.repaint();
