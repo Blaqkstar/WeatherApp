@@ -242,17 +242,19 @@ public class Application {
                     locationArray[0] = searchInput.getText();
                 }
                 String locationString = locationArray[0];
-                // gets weather data
-                String data = getCurrentWeatherData(locationString);
+                // gets current weather data
+                String currentWeatherData = getCurrentWeatherData(locationString);
+                // gets forecast data
+                String forecastData = getWeatherForecastData(locationString);
                 // parses and displays data
-                parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel);
+                parseAndDisplayData(currentWeatherData, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel);
             });
 
 
             // gets weather data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
-            String data = getCurrentWeatherData(location);
+            String currentWeatherData = getCurrentWeatherData(location);
             // parses and displays data -- FOR DEBUG PURPOSES ONLY. DELETE AFTER UI IS DONE!!!
-            parseAndDisplayData(data, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel);
+            parseAndDisplayData(currentWeatherData, weather, temperatureStyle, locationInfoPanel, locationLabel, temperatureLabel, conditionLabel, weatherConditionImageLabel);
 
             locationInfoPanel.revalidate();
             locationInfoPanel.repaint();
@@ -365,6 +367,7 @@ public class Application {
         return location;
     }
 
+    //TODO: NEED TO SET UP A PARSE/DISPLAY METHOD FOR FORECAST
     public static void parseAndDisplayData(String data, Weather weather, Integer temperatureStyle, JPanel locationInfoPanel, JLabel locationLabel, JLabel temperatureLabel, JLabel conditionLabel, JLabel weatherConditionImageLabel) {
         // parse
         JSONObject jsonObject = new JSONObject(data);
@@ -410,7 +413,6 @@ public class Application {
         locationInfoPanel.repaint();
     }
 
-    //TODO: NEED TO SET UP THE REST OF THE WEATHER ICONS
     public static ImageIcon getImageIcon(Weather weather) {
         File file = new File("");
         ImageIcon weatherConditionImage = null;
