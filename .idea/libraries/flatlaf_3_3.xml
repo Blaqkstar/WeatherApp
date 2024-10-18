@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="flatlaf-3.3">
+  <library name="flatlaf-3.5.1">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../flatlaf-3.3.jar!/" />
     </CLASSES>

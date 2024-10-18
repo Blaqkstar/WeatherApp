@@ -17,6 +17,7 @@ import java.net.URL;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import org.json.*;
 
+//TODO: In between semesters, finish building out C/F toggle, add additional info along the sides (UV index, wind, etc), and complete 5-day forecast functionality
 public class Application {
     public static void main(String[] args) {
         Weather weather = new Weather(); // declares and instantiates weather
@@ -37,7 +38,7 @@ public class Application {
 
             // creates main frame
             JFrame applicationFrame = new JFrame("Weather App");
-            applicationFrame.setSize(900, 600);
+            applicationFrame.setSize(900, 425);
             applicationFrame.setLayout(new FlowLayout(FlowLayout.CENTER));
             applicationFrame.setResizable(false);
             applicationFrame.setLocationRelativeTo(null); // forces app to launch centered on screen
@@ -85,7 +86,7 @@ public class Application {
 
             // -------------------------------------- LOCATION INFO PANEL STUFF
             JPanel locationInfoPanel = new JPanel();
-            locationInfoPanel.setPreferredSize(new Dimension(550, 300));
+            locationInfoPanel.setPreferredSize(new Dimension(550, 315));
             locationInfoPanel.setLayout(new BoxLayout(locationInfoPanel, BoxLayout.Y_AXIS));
             //locationInfoPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
@@ -164,13 +165,14 @@ public class Application {
             locationInfoPanel.add(currentWeatherSubPanel);
 
             // -------------------------------------- FORECAST PANEL STUFF
+            // --------------------- pretty sure there won't be enough time to finish this part of the app. Saving for a later build
             // creates weather display panel
             JPanel forecastPanel = new JPanel();
             forecastPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
             forecastPanel.setPreferredSize(new Dimension(880, 150));
             forecastPanel.setBorder(new LineBorder(Color.BLACK, 1)); // border for debugging. remove before final build!!!
 
-            // weather panel contents
+            // forecast panel contents
             // DAY ONE
             JPanel dayOnePanel = new JPanel();
             dayOnePanel.setAlignmentX(Component.CENTER_ALIGNMENT); // centers panel in parent container
@@ -392,7 +394,6 @@ public class Application {
         weather.setDay(currentWeather.getInt("is_day")); // day/night boolean
         weather.setVisionKM(currentWeather.getDouble("vis_km")); // vision (km)
         weather.setVisionMiles(currentWeather.getDouble("vis_miles")); // vision (miles)
-        
 
         // updates outputs with weather data
         locationLabel.setText((weather.getCityName() + ", " + weather.getStateName()));
@@ -809,7 +810,8 @@ public class Application {
                 else {
                     file = new File("resources/images/WeatherIcons/day/392.png");
                 }
-            }else if (weather.getCondition().equalsIgnoreCase("moderate or heavy snow with thunder")) {
+            }
+            else if (weather.getCondition().equalsIgnoreCase("moderate or heavy snow with thunder")) {
                 if (weather.getDay() == 0) {
                     file = new File("resources/images/WeatherIcons/night/395.png");
                 }
